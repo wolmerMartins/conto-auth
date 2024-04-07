@@ -1,8 +1,11 @@
-const resolve = require('@rollup/plugin-node-resolve')
-const svelte = require('rollup-plugin-svelte')
+import autoPreprocess from 'svelte-preprocess'
+import childProcess from 'child_process'
+import resolve from '@rollup/plugin-node-resolve'
+import svelte from 'rollup-plugin-svelte'
+import typescript from '@rollup/plugin-typescript'
 
 function serve() {
-  let server
+  let server: childProcess.ChildProcessByStdio<null, null, null>
 
   function toExit() {
     if (server) server.kill(0)
@@ -12,7 +15,7 @@ function serve() {
     writeBundle() {
       if (server) return
 
-      server = require('child_process').spawn(
+      server = childProcess.spawn(
         'npm',
         ['run', 'start', '--', '--dev'],
         {
@@ -27,8 +30,8 @@ function serve() {
   }
 }
 
-module.exports = {
-  input: 'src/main.js',
+export default {
+  input: 'src/main.ts',
   output: {
     file: 'public/build/bundle.js',
     format: 'iife',
@@ -36,8 +39,10 @@ module.exports = {
   },
   plugins: [
     svelte({
-      include: 'src/**/*.svelte'
+      include: 'src/**/*.svelte',
+      preprocess: autoPreprocess()
     }),
+    typescript(),
     resolve({ browser: true }),
     serve()
   ]
