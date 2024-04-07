@@ -15,5 +15,10 @@ services:
           target: /app/src
           ignore:
             - node_modules/
+        - action: sync+restart
+          path: ./rollup.config.ts
+          target: /app/rollup.config.ts
+          ignore:
+            - node_modules/
         - action: rebuild
           path: package.json
