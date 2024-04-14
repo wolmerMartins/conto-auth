@@ -1,8 +1,9 @@
-import autoPreprocess from 'svelte-preprocess'
-import childProcess from 'child_process'
 import resolve from '@rollup/plugin-node-resolve'
-import svelte from 'rollup-plugin-svelte'
 import typescript from '@rollup/plugin-typescript'
+import childProcess from 'child_process'
+import css from 'rollup-plugin-css-only'
+import svelte from 'rollup-plugin-svelte'
+import autoPreprocess from 'svelte-preprocess'
 
 function serve() {
   let server: childProcess.ChildProcessByStdio<null, null, null>
@@ -40,8 +41,10 @@ export default {
   plugins: [
     svelte({
       include: 'src/**/*.svelte',
-      preprocess: autoPreprocess()
+      preprocess: autoPreprocess(),
+      emitCss: true
     }),
+    css({ output: 'bundle.css' }),
     typescript(),
     resolve({ browser: true }),
     serve()
