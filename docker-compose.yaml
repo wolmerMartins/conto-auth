@@ -20,5 +20,10 @@ services:
           target: /app/rollup.config.ts
           ignore:
             - node_modules/
+        - action: sync+restart
+          path: ./public
+          target: /app/public
+          ignore:
+            - node_modules/
         - action: rebuild
           path: package.json
