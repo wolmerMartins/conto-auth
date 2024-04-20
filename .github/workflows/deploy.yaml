@@ -17,15 +17,15 @@ jobs:
         with:
           node-version: 20.10.0
 
+      - name: Event data
+        run: toJson(github.event)
+
       - name: Dependencies cache
         uses: actions/cache@v3
         id: dependencies-cache
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-${{ hashFiles('**/package-lock.json') }}
-
-      - name: Event data
-        run: toJson(github.event)
 
       - name: Install dependencies
         if: steps.dependencies-cache.outputs.cache-hit != 'true'
