@@ -28,7 +28,7 @@ jobs:
         if: steps.dependencies-cache.outputs.cache-hit != 'true'
         run: |
           npm ci --ignore-scripts && \
-          echo "Event data: {{ toJson(github.event) }}"
+          echo "{{ github.event.ref }}"
 
   # prerelease:
   #   if: "!contains(github.event.head_commit.message, 'chore(release)')"
