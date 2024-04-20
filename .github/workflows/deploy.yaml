@@ -24,11 +24,12 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-node_modules-${{ hashFiles('**/package-lock.json') }}
 
+      - name: Event data
+        run: toJson(github.event)
+
       - name: Install dependencies
         if: steps.dependencies-cache.outputs.cache-hit != 'true'
-        run: |
-          npm ci --ignore-scripts && \
-          echo "{{ github.event.ref }}"
+        run: npm ci --ignore-scripts
 
   # prerelease:
   #   if: "!contains(github.event.head_commit.message, 'chore(release)')"
