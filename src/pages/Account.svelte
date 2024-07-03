@@ -1,6 +1,6 @@
 <script>
-  import Button from '../components/Button.svelte';
-import Image from '../components/Image.svelte'
+  import Button from '../components/Button.svelte'
+  import Image from '../components/Image.svelte'
   import Input from '../components/Input.svelte'
 
   let email = ''
