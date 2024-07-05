@@ -1,25 +1,18 @@
 <script>
-  import Button from '../components/Button.svelte'
-  import Image from '../components/Image.svelte'
-  import Input from '../components/Input.svelte'
+  import Image from '../components/base/Image.svelte'
+  import CheckAccount from '../components/CheckAccount.svelte'
 
-  let email = ''
-
-  function showEmail() {
-    console.log(email)
-  }
+  const logoDescription = 'The conto logo as a SVG image in white color.'
 </script>
 
 <div class="main-container">
   <Image
     src="assets/images/logo.svg"
-    alt="conto logo"
-    caption="The conto logo as a SVG image in white color."
+    alt={logoDescription}
+    caption={logoDescription}
   />
 
-  <Input label="email" bind:value={email} />
-
-  <Button on:click={showEmail}>next</Button>
+  <CheckAccount />
 </div>
 
 <style>
