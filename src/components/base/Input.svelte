@@ -1,14 +1,16 @@
-<script>
+<script lang="ts">
   export let label = ''
   export let value = ''
+
+  const inputId = `input-${label}`
 </script>
 
 <div class="input-container">
-  <label for="input">
+  <label for={inputId}>
     { label }
   </label>
   <input
-    id="input"
+    id={inputId}
     class="input"
     type="text"
     bind:value
