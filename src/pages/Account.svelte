@@ -1,8 +1,19 @@
-<script>
+<script lang="ts">
   import Image from '../components/base/Image.svelte'
   import CheckAccount from '../components/CheckAccount.svelte'
+  import ManageAccount from './ManageAccount.svelte'
 
   const logoDescription = 'The conto logo as a SVG image in white color.'
+
+  let email: string
+  let isAlreadyCreated = false
+  let isAccountAlreadyChecked = false
+
+  export function onAccountChecked(email: string, isAlreadyCreated: boolean): void {
+    email = email
+    isAlreadyCreated = isAlreadyCreated
+    isAccountAlreadyChecked = true
+  }
 </script>
 
 <div class="main-container">
@@ -12,7 +23,11 @@
     caption={logoDescription}
   />
 
-  <CheckAccount />
+  {#if !isAccountAlreadyChecked}
+    <CheckAccount {onAccountChecked} />
+  {:else}
+    <ManageAccount email={email} isAccountAlreadyCreated={isAlreadyCreated} />
+  {/if}
 </div>
 
 <style>
