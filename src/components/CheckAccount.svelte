@@ -2,14 +2,14 @@
   import Button from './base/Button.svelte'
   import Input from './base/Input.svelte'
 
-  export let onAccountChecked: (isAlreadyCreated: boolean) => void
+  export let onAccountChecked: (email: string, isAlreadyCreated: boolean) => void
 
   let email: string
 
   function checkAccount(): void {
     if (!email) return
 
-    onAccountChecked(false)
+    onAccountChecked(email, false)
   }
 </script>
 
