@@ -1,0 +1,31 @@
+on:
+  push:
+
+jobs:
+  testing:
+    name: testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Config
+        uses: actions/checkout@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.11.0
+
+      - name: Dependencies cache
+        uses: actions/cache@v4
+        id: dependencies-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        if: ${{ steps.dependencies-cache.outputs.cache-hit != 'true' }}
+        shell: bash
+        run: npm ci --ignore-scripts
+
+      - name: Run tests
+        shell: bash
+        run: npm test
