@@ -39,13 +39,13 @@ export default {
     name: 'app'
   },
   plugins: [
+    typescript(),
     svelte({
       include: 'src/**/*.svelte',
       preprocess: autoPreprocess(),
       emitCss: true
     }),
     css({ output: 'bundle.css' }),
-    typescript(),
     resolve({ browser: true }),
     serve()
   ]
