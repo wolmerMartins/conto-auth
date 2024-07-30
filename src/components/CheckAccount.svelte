@@ -1,18 +1,31 @@
 <script lang="ts">
+  import { useAccounts } from '../hooks/use-accounts'
+  import { isValidEmail } from '../services/accounts.service'
   import Button from './base/Button.svelte'
   import Input from './base/Input.svelte'
 
-  export let onAccountChecked: (email: string, isAlreadyCreated: boolean) => void
-
   let email: string
 
-  function checkAccount(): void {
-    if (!email) return
+  const { setEmail } = useAccounts()
 
-    onAccountChecked(email, false)
+  function hasValidEmail(email: string): boolean {
+    return Boolean(email && isValidEmail(email))
   }
+
+  function checkAccount(): void {
+    if (!hasValidEmail(email)) return
+
+    setEmail(email)
+  }
+
+  $: shouldDisableButton = !hasValidEmail(email)
 </script>
 
 <Input label="email" bind:value={email} />
 
-<Button disabled={!email} on:click={checkAccount}>next</Button>
+<Button
+  disabled={shouldDisableButton}
+  on:click={checkAccount}
+>
+  next
+</Button>
