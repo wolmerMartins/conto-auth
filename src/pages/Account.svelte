@@ -8,12 +8,6 @@
   let email: string
   let isAlreadyCreated = false
   let isAccountAlreadyChecked = false
-
-  export function onAccountChecked(email: string, isAlreadyCreated: boolean): void {
-    email = email
-    isAlreadyCreated = isAlreadyCreated
-    isAccountAlreadyChecked = true
-  }
 </script>
 
 <div class="main-container">
@@ -24,7 +18,7 @@
   />
 
   {#if !isAccountAlreadyChecked}
-    <CheckAccount {onAccountChecked} />
+    <CheckAccount />
   {:else}
     <ManageAccount email={email} isAccountAlreadyCreated={isAlreadyCreated} />
   {/if}
