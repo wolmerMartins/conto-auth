@@ -12,7 +12,7 @@ export function isValidEmail(email: string): boolean {
   return Boolean(address && domainName && domainExtension)
 }
 
-export async function checkAccount(email: string): Promise<CheckAccountResult> {
+export async function checkAccountByEmail(email: string): Promise<CheckAccountResult> {
   try {
     const response = await fetch(`http://localhost:5000/accounts/${email}/exists`)
 
