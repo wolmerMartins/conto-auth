@@ -53,8 +53,14 @@ describe('CheckAccount.svelte', () => {
     const button = screen.getByRole('button')
     await user.click(button)
 
+    let callNum = 0
     useAccounts(
       (state: AccountState): void => {
+        if (callNum < 1) {
+          callNum += 1
+          return
+        }
+
         done.expect(state).toHaveProperty('email', email)
       }
     )

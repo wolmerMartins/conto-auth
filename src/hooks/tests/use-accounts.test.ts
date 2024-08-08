@@ -28,18 +28,6 @@ describe('use-accounts', () => {
     unsubscriber && unsubscriber()
   })
 
-  describe('setEmail()', () => {
-    test('sets an email to the accounts state', done => {
-      const email = 'test@test.com'
-
-      const { setEmail } = useAccounts()
-
-      setEmail(email)
-
-      unsubscriber = assertStateData(done, 'email', email)
-    })
-  })
-
   describe('setDocument()', () => {
     test('sets a document to the accounts state', done => {
       const document = '1234567890'
@@ -83,10 +71,10 @@ describe('use-accounts', () => {
     test('gets state data twice when subscribing and when setting an email', () => {
       const getStateData = vi.fn()
 
-      const { setEmail, unsubscribe } = useAccounts(getStateData)
+      const { setPassword, unsubscribe } = useAccounts(getStateData)
       unsubscriber = unsubscribe
 
-      setEmail('test@test.com')
+      setPassword('test@test.com')
 
       expect(getStateData).toHaveBeenCalledTimes(2)
     })
@@ -94,11 +82,11 @@ describe('use-accounts', () => {
     test('stops receiving state data after fires the unsubscribe function', () => {
       const getStateData = vi.fn()
 
-      const { unsubscribe, setEmail } = useAccounts(getStateData)
+      const { unsubscribe, setDocument } = useAccounts(getStateData)
 
       unsubscribe!()
 
-      setEmail('test@test.com')
+      setDocument('test@test.com')
 
       expect(getStateData).toHaveBeenCalledTimes(1)
     })

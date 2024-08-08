@@ -17,9 +17,14 @@
     width: 100%;
     font-family: inherit;
     font-size: 1rem;
-  }
+    transition: all 0.5s linear;
 
-  .button:hover {
-    opacity: .5;
+    &:hover {
+      background-color: #3cb19b;
+    }
+
+    &:disabled {
+      opacity: 0.3;
+    }
   }
 </style>
