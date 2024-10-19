@@ -1,5 +1,5 @@
 import { writable, type Unsubscriber } from 'svelte/store'
-import { checkAccountByEmail } from '../services/accounts.service'
+import { type CheckAccountByEmail } from '../services/accounts.service'
 
 export type AccountState = {
   email?: string
@@ -65,22 +65,30 @@ function getStateDataSubscriber(getStateData?: GetStateData): Unsubscriber | und
   return state.subscribe(getStateData)
 }
 
-async function checkAccount(email: string): Promise<void> {
-  startCheckingAccount()
+function configureCheckAccount(checkAccountByEmail: CheckAccountByEmail): (email: string) => Promise<void> {
+  return async function(email: string): Promise<void> {
+    startCheckingAccount()
 
-  const { success, exists } = await checkAccountByEmail(email)
-  if (!success) return
+    const { success, exists } = await checkAccountByEmail(email)
+    if (!success) return
 
-  finishCheckingAccount(email, exists)
-}
-
-export function useAccounts(getStateData?: GetStateData): UseAccounts {
-  const unsubscribe = getStateDataSubscriber(getStateData)
-
-  return {
-    setDocument,
-    setPassword,
-    checkAccount,
-    unsubscribe
+    finishCheckingAccount(email, exists)
   }
 }
+
+let useAccounts: (getStateData?: GetStateData) => UseAccounts
+
+function configureUseAccounts(checkAccountByEmail: CheckAccountByEmail): void {
+  useAccounts = function(getStateData?: GetStateData): UseAccounts {
+    const unsubscribe = getStateDataSubscriber(getStateData)
+
+    return {
+      setDocument,
+      setPassword,
+      checkAccount: configureCheckAccount(checkAccountByEmail),
+      unsubscribe
+    }
+  }
+}
+
+export { configureUseAccounts, useAccounts }
