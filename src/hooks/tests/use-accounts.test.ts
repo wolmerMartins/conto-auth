@@ -1,13 +1,19 @@
 import type { Unsubscriber } from 'svelte/store'
 import { describe, expect, test, vi, type TestContext } from 'vitest'
 
-import { useAccounts, type AccountState } from '../use-accounts'
+import { configureUseAccounts, useAccounts, type AccountState } from '../use-accounts'
+
+const checkAccountByEmailMock = vi.fn(
+  async () => ({ success: true, exists: true })
+)
+
+configureUseAccounts(checkAccountByEmailMock)
 
 describe('use-accounts', () => {
   function assertStateData(
     done: TestContext,
     key: keyof AccountState,
-    value: string
+    value: string | boolean
   ): Unsubscriber {
     function getStateData(state: AccountState): void {
       done.expect(state).toHaveProperty(key, value)
