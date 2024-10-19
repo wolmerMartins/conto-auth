@@ -3,6 +3,8 @@ export type CheckAccountResult = {
   exists?: boolean
 }
 
+export type CheckAccountByEmail = (email: string) => Promise<CheckAccountResult>
+
 export function isValidEmail(email: string): boolean {
   const [address, domain] = email.split('@')
   if (!domain) return false
