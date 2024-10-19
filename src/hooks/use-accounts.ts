@@ -7,6 +7,7 @@ export type AccountState = {
   password?: string
   isCheckingAccount?: boolean
   isAccountCreated?: boolean
+  isAccountAlreadyChecked?: boolean
 }
 
 type GetStateData = (state: AccountState) => void
@@ -20,7 +21,8 @@ type UseAccounts = {
 
 const state = writable<AccountState>({
   isCheckingAccount: false,
-  isAccountCreated: false
+  isAccountCreated: false,
+  isAccountAlreadyChecked: false
 })
 
 function updateState<T>(key: keyof AccountState, value: T): void {
@@ -49,6 +51,8 @@ function setIsAccountCreated(isAccountCreated: boolean): void {
 function finishCheckingAccount(email: string, exists?: boolean): void {
   setEmail(email)
   setIsAccountCreated(Boolean(exists))
+  updateState('isCheckingAccount', false)
+  updateState('isAccountAlreadyChecked', true)
 }
 
 function startCheckingAccount(): void {
