@@ -1,4 +1,4 @@
-import { writable, type Unsubscriber } from 'svelte/store'
+import { get, writable, type Unsubscriber } from 'svelte/store'
 import { type CheckAccountByEmail } from '../services/accounts.service'
 
 export type AccountState = {
@@ -8,28 +8,47 @@ export type AccountState = {
   isCheckingAccount?: boolean
   isAccountCreated?: boolean
   isAccountAlreadyChecked?: boolean
+  errorMessage?: string
 }
 
 type GetStateData = (state: AccountState) => void
 
 type UseAccounts = {
+  getState: () => AccountState
+  resetState: () => void
   setDocument: (document: string) => void
   setPassword: (password: string) => void
   checkAccount: (email: string) => Promise<void>
   unsubscribe?: Unsubscriber | undefined
 }
 
-const state = writable<AccountState>({
+const initialState: AccountState = {
+  email: undefined,
+  document: undefined,
+  password: undefined,
   isCheckingAccount: false,
   isAccountCreated: false,
-  isAccountAlreadyChecked: false
-})
+  isAccountAlreadyChecked: false,
+  errorMessage: undefined
+}
+
+const state = writable<AccountState>(initialState)
+
+function getState(): AccountState {
+  return get(state)
+}
 
 function updateState<T>(key: keyof AccountState, value: T): void {
   state.update(currentState => ({
     ...currentState,
     [key]: value
   }))
+}
+
+function resetState(): void {
+  Object.keys(initialState).forEach(
+    key => updateState(<keyof AccountState>key, initialState[<keyof AccountState>key])
+  )
 }
 
 function setPassword(password: string): void {
@@ -48,7 +67,12 @@ function setIsAccountCreated(isAccountCreated: boolean): void {
   updateState('isAccountCreated', isAccountCreated)
 }
 
-function finishCheckingAccount(email: string, exists?: boolean): void {
+function checkAccountFailed(): void {
+  updateState('errorMessage', 'It was not possible to check the account. Please try again.')
+  updateState('isCheckingAccount', false)
+}
+
+function checkAccountSucceed(email: string, exists?: boolean): void {
   setEmail(email)
   setIsAccountCreated(Boolean(exists))
   updateState('isCheckingAccount', false)
@@ -56,7 +80,10 @@ function finishCheckingAccount(email: string, exists?: boolean): void {
 }
 
 function startCheckingAccount(): void {
+  updateState('errorMessage', undefined)
   updateState('isCheckingAccount', true)
+  updateState('isAccountAlreadyChecked', false)
+  setIsAccountCreated(false)
 }
 
 function getStateDataSubscriber(getStateData?: GetStateData): Unsubscriber | undefined {
@@ -70,9 +97,10 @@ function configureCheckAccount(checkAccountByEmail: CheckAccountByEmail): (email
     startCheckingAccount()
 
     const { success, exists } = await checkAccountByEmail(email)
-    if (!success) return
+    if (!success)
+      return checkAccountFailed()
 
-    finishCheckingAccount(email, exists)
+    checkAccountSucceed(email, exists)
   }
 }
 
@@ -83,6 +111,8 @@ function configureUseAccounts(checkAccountByEmail: CheckAccountByEmail): void {
     const unsubscribe = getStateDataSubscriber(getStateData)
 
     return {
+      getState,
+      resetState,
       setDocument,
       setPassword,
       checkAccount: configureCheckAccount(checkAccountByEmail),
