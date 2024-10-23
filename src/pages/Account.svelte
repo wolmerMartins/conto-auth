@@ -1,13 +1,18 @@
 <script lang="ts">
   import Image from '../components/base/Image.svelte'
   import CheckAccount from '../components/CheckAccount.svelte'
+  import { useAccounts, type AccountState } from '../hooks/use-accounts'
   import ManageAccount from './ManageAccount.svelte'
 
   const logoDescription = 'The conto logo as a SVG image in white color.'
 
-  let email: string
-  let isAlreadyCreated = false
   let isAccountAlreadyChecked = false
+
+  function getState(state: AccountState): void {
+    isAccountAlreadyChecked = Boolean(state.isAccountAlreadyChecked)
+  }
+
+  useAccounts(getState)
 </script>
 
 <div class="main-container">
@@ -20,7 +25,7 @@
   {#if !isAccountAlreadyChecked}
     <CheckAccount />
   {:else}
-    <ManageAccount email={email} isAccountAlreadyCreated={isAlreadyCreated} />
+    <ManageAccount />
   {/if}
 </div>
 
