@@ -1,6 +1,7 @@
 <script lang="ts">
   export let label = ''
   export let value = ''
+  export let disabled = false
   export let errorMessage: string = ''
 
   let inputClasses = 'input'
@@ -18,6 +19,7 @@
   <input
     id={inputId}
     class={inputClasses}
+    {disabled}
     type="text"
     bind:value
   />
