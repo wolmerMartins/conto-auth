@@ -1,7 +1,7 @@
 #! /bin/sh
 
 start_dev() {
-  docker compose watch
+  docker compose watch --prune
 }
 
 start_logging() {
