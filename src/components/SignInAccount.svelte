@@ -1,8 +1,16 @@
 <script lang="ts">
+  import { onMount } from 'svelte'
+  import { useAccounts } from '../hooks/use-accounts'
   import Button from './base/Button.svelte'
   import Input from './base/Input.svelte'
 
-  export let email: string
+  let email: string
+
+  const { getState } = useAccounts()
+
+  onMount(() => {
+    email = getState().email!
+  })
 
   let password: string
 
@@ -13,8 +21,8 @@
   $: shouldDisableSignIn = !canSignIn(email, password)
 </script>
 
-<Input label="email" bind:value={email} />
+<Input label="email" bind:value={email} disabled={true} />
 
 <Input label="password" bind:value={password} />
 
-<Button disabled={shouldDisableSignIn}>Login</Button>
+<Button disabled={shouldDisableSignIn}>login</Button>
