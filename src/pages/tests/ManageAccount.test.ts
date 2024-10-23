@@ -1,13 +1,30 @@
 import { render, screen } from '@testing-library/svelte'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import ManageAccount from '../ManageAccount.svelte'
+import { configureUseAccounts, useAccounts } from '../../hooks/use-accounts'
 
 describe('ManageAccount.svelte', () => {
-  test('inits the email input with the received value to create account', () => {
-    const email = 'test.create@account.com'
+  const checkAccountByEmailMock = vi.fn(
+    async () => ({ success: true, exists: false })
+  )
 
-    render(ManageAccount, { email, isAccountAlreadyCreated: false })
+  configureUseAccounts(checkAccountByEmailMock)
+
+  const { checkAccount, resetState } = useAccounts()
+
+  const email = 'test.create@account.com'
+
+  beforeEach(async () => {
+    await checkAccount(email)
+  })
+
+  afterEach(() => {
+    resetState()
+  })
+
+  test('inits the email input with the received value to create account', () => {
+    render(ManageAccount)
 
     const inputEmail = screen.getByDisplayValue(email)
 
@@ -15,27 +32,29 @@ describe('ManageAccount.svelte', () => {
   })
 
   test('must have a create account button if the account does not exist yet', () => {
-    render(ManageAccount, { email: 'test@test.com', isAccountAlreadyCreated: false })
+    render(ManageAccount)
 
-    const createAccountButton = screen.getByText('Create account')
+    const createAccountButton = screen.getByText('create account')
 
     expect(createAccountButton).toBeDefined()
   })
 
   test('inits the email input with the received value to login into account', () => {
-    const email = 'test.login@account.com'
-
-    render(ManageAccount, { email, isAccountAlreadyCreated: true })
+    render(ManageAccount)
 
     const inputEmail = screen.getByDisplayValue(email)
 
     expect(inputEmail).toBeDefined()
   })
 
-  test('must have a login button if the account already exists', () => {
-    render(ManageAccount, { email: 'test@test.com', isAccountAlreadyCreated: true })
+  test('must have a login button if the account already exists', async () => {
+    checkAccountByEmailMock.mockResolvedValueOnce({ success: true, exists: true })
 
-    const loginButton = screen.getByText('Login')
+    await checkAccount(email)
+
+    render(ManageAccount)
+
+    const loginButton = screen.getByText('login')
 
     expect(loginButton).toBeDefined()
   })
