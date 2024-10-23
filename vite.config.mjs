@@ -6,6 +6,12 @@ export default defineConfig({
   plugins: [svelte({ preprocess: sveltePreprocess() })],
   test: {
     globals: true,
-    environment: 'jsdom'
+    environment: 'jsdom',
+    alias: [
+      {
+        find: /^svelte$/,
+        replacement: 'svelte/internal'
+      }
+    ]
   }
 })

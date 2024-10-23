@@ -2,12 +2,12 @@ import { get, writable, type Unsubscriber } from 'svelte/store'
 import { type CheckAccountByEmail } from '../services/accounts.service'
 
 export type AccountState = {
+  isCheckingAccount: boolean
+  isAccountCreated: boolean
+  isAccountAlreadyChecked: boolean
   email?: string
   document?: string
   password?: string
-  isCheckingAccount?: boolean
-  isAccountCreated?: boolean
-  isAccountAlreadyChecked?: boolean
   errorMessage?: string
 }
 

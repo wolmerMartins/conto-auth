@@ -4,11 +4,15 @@
   import Button from './base/Button.svelte'
   import Input from './base/Input.svelte'
 
+  const invalidEmailMessage = 'The email is not valid'
+
   let email: string
   let isCheckingAccount = false
+  let errorMessage: string | undefined = undefined
 
   function getState(state: AccountState): void {
     isCheckingAccount = Boolean(state.isCheckingAccount)
+    errorMessage = state.errorMessage
   }
 
   const { checkAccount } = useAccounts(getState)
@@ -17,16 +21,26 @@
     return Boolean(email && isValidEmail(email))
   }
 
-  function handleCheckAccount(): void {
-    if (!hasValidEmail(email)) return
+  async function handleCheckAccount(): Promise<void> {
+    if (!hasValidEmail(email)) {
+      errorMessage = invalidEmailMessage
+      return
+    }
 
-    checkAccount(email)
+    await checkAccount(email)
+  }
+
+  function validateEmail(email: string): void {
+    if (hasValidEmail(email)) return
+
+    errorMessage = invalidEmailMessage
   }
 
   $: shouldDisableButton = !hasValidEmail(email) || isCheckingAccount
+  $: validateEmail(email)
 </script>
 
-<Input label="email" bind:value={email} />
+<Input label="email" bind:value={email} {errorMessage} />
 
 <Button
   disabled={shouldDisableButton}

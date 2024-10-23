@@ -1,13 +1,20 @@
 <script lang="ts">
+  import { onMount } from 'svelte'
   import SignInAccount from '../components/SignInAccount.svelte'
   import SignUpAccount from '../components/SignUpAccount.svelte'
+  import { useAccounts } from '../hooks/use-accounts'
 
-  export let isAccountAlreadyCreated: boolean
-  export let email: string
+  let isAccountAlreadyCreated: boolean
+
+  const { getState } = useAccounts()
+
+  onMount(() => {
+    isAccountAlreadyCreated = getState().isAccountCreated
+  })
 </script>
 
 {#if isAccountAlreadyCreated}
-  <SignInAccount {email} />
+  <SignInAccount />
 {:else}
-  <SignUpAccount {email} />
+  <SignUpAccount />
 {/if}

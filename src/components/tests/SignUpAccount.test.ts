@@ -1,12 +1,31 @@
 import { render, screen } from '@testing-library/svelte'
 import userEvent from '@testing-library/user-event'
-import { test } from 'vitest'
+import { test, vi } from 'vitest'
 
 import SignUpAccount from '../SignUpAccount.svelte'
+import { configureUseAccounts, useAccounts } from '../../hooks/use-accounts'
 
 describe('SignUpAccount.svelte', () => {
+  const checkAccountByEmailMock = vi.fn(
+    async () => ({ success: true })
+  )
+
+  configureUseAccounts(checkAccountByEmailMock)
+
+  const { checkAccount, resetState } = useAccounts()
+
+  const email = 'signup@email.com'
+
+  beforeEach(async () => {
+    await checkAccount(email)
+  })
+
+  afterEach(() => {
+    resetState()
+  })
+
   test('button must be disabled when all required data is empty', () => {
-    render(SignUpAccount, { email: 'test@test.com' })
+    render(SignUpAccount)
 
     const button = screen.getByRole('button')
 
@@ -16,7 +35,7 @@ describe('SignUpAccount.svelte', () => {
   test('button must be disabled when at least one required account field is empty', async () => {
     const user = userEvent.setup()
 
-    render(SignUpAccount, { email: 'test@test.com' })
+    render(SignUpAccount)
 
     const documentInput = await screen.findByLabelText('document')
     await user.type(documentInput, '123456789')
@@ -26,29 +45,10 @@ describe('SignUpAccount.svelte', () => {
     expect(button).toHaveProperty('disabled', true)
   })
 
-  test('button must be disabled when the provided email is removed and not typed again', async () => {
+  test('button must be enabled when all required account fields are filled in', async () => {
     const user = userEvent.setup()
 
-    render(SignUpAccount, { email: 'test@test.com' })
-
-    const emailInput = await screen.findByLabelText('email')
-    await user.clear(emailInput)
-
-    const documentInput = await screen.findByLabelText('document')
-    await user.type(documentInput, '123456789')
-
-    const passwordInput = await screen.findByLabelText('password')
-    await user.type(passwordInput, '123456')
-
-    const button = screen.getByRole('button')
-
-    expect(button).toHaveProperty('disabled', true)
-  })
-
-  test('button must be enabled when all required account fields are filled', async () => {
-    const user = userEvent.setup()
-
-    render(SignUpAccount, { email: 'test@test.com' })
+    render(SignUpAccount)
 
     const documentInput = screen.getByLabelText('document')
     await user.type(documentInput, '123456789')
@@ -59,5 +59,16 @@ describe('SignUpAccount.svelte', () => {
     const button = screen.getByRole('button')
 
     expect(button).toHaveProperty('disabled', false)
+  })
+
+  test('not allow changing the email when signing up', async () => {
+    const user = userEvent.setup()
+
+    render(SignUpAccount)
+
+    const emailInput = screen.getByLabelText('email')
+    await user.type(emailInput, 'changed@email.com')
+
+    expect(emailInput).toHaveProperty('value', email)
   })
 })
