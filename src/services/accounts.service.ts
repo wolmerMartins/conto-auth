@@ -1,6 +1,7 @@
 export type CheckAccountResult = {
   success: boolean
   exists?: boolean
+  message?: string
 }
 
 export type CheckAccountByEmail = (email: string) => Promise<CheckAccountResult>
@@ -25,6 +26,9 @@ export async function checkAccountByEmail(email: string): Promise<CheckAccountRe
       exists
     }
   } catch {
-    return { success: false }
+    return {
+      success: false,
+      message: 'It was not possible to check the account. Please try again.'
+    }
   }
 }
