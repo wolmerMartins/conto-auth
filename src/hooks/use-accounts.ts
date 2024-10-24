@@ -68,8 +68,8 @@ function setIsAccountCreated(isAccountCreated: boolean): void {
   updateState('isAccountCreated', isAccountCreated)
 }
 
-function checkAccountFailed(): void {
-  updateState('errorMessage', 'It was not possible to check the account. Please try again.')
+function checkAccountFailed(message: string): void {
+  updateState('errorMessage', message)
   updateState('isCheckingAccount', false)
 }
 
@@ -97,9 +97,9 @@ function configureCheckAccount(checkAccountByEmail: CheckAccountByEmail): (email
   return async function(email: string): Promise<void> {
     startCheckingAccount()
 
-    const { success, exists } = await checkAccountByEmail(email)
+    const { success, exists, message } = await checkAccountByEmail(email)
     if (!success)
-      return checkAccountFailed()
+      return checkAccountFailed(message!)
 
     checkAccountSucceed(email, exists)
   }
