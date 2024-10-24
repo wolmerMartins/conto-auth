@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte'
   import { useAccounts, type AccountState } from '../hooks/use-accounts'
   import { isValidEmail } from '../services/accounts.service'
   import Button from './base/Button.svelte'
@@ -15,7 +16,7 @@
     errorMessage = state.errorMessage
   }
 
-  const { checkAccount } = useAccounts(getState)
+  const { checkAccount, unsubscribe } = useAccounts(getState)
 
   function hasValidEmail(email: string): boolean {
     return Boolean(email && isValidEmail(email))
@@ -38,6 +39,10 @@
 
   $: shouldDisableButton = !hasValidEmail(email) || isCheckingAccount
   $: validateEmail(email)
+
+  onDestroy(() => {
+    unsubscribe!()
+  })
 </script>
 
 <Input label="email" bind:value={email} {errorMessage} />

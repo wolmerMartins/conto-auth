@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte'
   import Image from '../components/base/Image.svelte'
   import CheckAccount from '../components/CheckAccount.svelte'
   import { useAccounts, type AccountState } from '../hooks/use-accounts'
@@ -12,7 +13,11 @@
     isAccountAlreadyChecked = Boolean(state.isAccountAlreadyChecked)
   }
 
-  useAccounts(getState)
+  const { unsubscribe } = useAccounts(getState)
+
+  onDestroy(() => {
+    unsubscribe!()
+  })
 </script>
 
 <div class="main-container">
