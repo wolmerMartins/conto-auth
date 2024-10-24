@@ -4,9 +4,10 @@ import { expect, test, describe, vi } from 'vitest'
 
 import { configureUseAccounts, useAccounts } from '../../hooks/use-accounts'
 import CheckAccount from '../CheckAccount.svelte'
+import type { CheckAccountResult } from '../../services/accounts.service'
 
 describe('CheckAccount.svelte', () => {
-  const checkAccountByEmailMock = vi.fn(
+  const checkAccountByEmailMock = vi.fn<[email: string], Promise<CheckAccountResult>>(
     async () => ({ success: true, exists: true })
   )
 
@@ -85,7 +86,9 @@ describe('CheckAccount.svelte', () => {
   })
 
   test('displays an error message when there is an error checking the account', async () => {
-    checkAccountByEmailMock.mockResolvedValueOnce({ success: false, exists: false })
+    const message = 'It was not possible to check the account. Please try again.'
+
+    checkAccountByEmailMock.mockResolvedValueOnce({ success: false, exists: false, message })
 
     const user = userEvent.setup()
 
@@ -97,7 +100,7 @@ describe('CheckAccount.svelte', () => {
     const button = screen.getByRole('button')
     await user.click(button)
 
-    const error = screen.getByText('It was not possible to check the account. Please try again.')
+    const error = screen.getByText(message)
 
     expect(error).toBeDefined()
   })

@@ -56,16 +56,15 @@ describe('use-accounts', () => {
     })
 
     test('sets the error message when checking account by email returns success false', async () => {
-      checkAccountByEmailMock.mockResolvedValueOnce({ success: false })
+      const message = 'It was not possible to check the account. Please try again.'
+
+      checkAccountByEmailMock.mockResolvedValueOnce({ success: false, message })
 
       const { checkAccount, getState } = useAccounts()
 
       await checkAccount('error@message.com')
 
-      expect(getState()).toHaveProperty(
-        'errorMessage',
-        'It was not possible to check the account. Please try again.'
-      )
+      expect(getState()).toHaveProperty('errorMessage', message)
     })
 
     test('sets the check account flag to false after check account failed', async () => {

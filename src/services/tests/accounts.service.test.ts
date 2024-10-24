@@ -61,6 +61,8 @@ describe('accounts.service', () => {
       global.fetch = fetch
     })
 
+    const message = 'It was not possible to check the account. Please try again.'
+
     test('makes a request with the provided email', async () => {
       const email = 'test@email.com'
 
@@ -101,7 +103,10 @@ describe('accounts.service', () => {
       expect(fetchMock).toHaveBeenCalledTimes(1)
       expect(fetchJsonMock).not.toHaveBeenCalled()
       expect(result).toEqual<CheckAccountResult>(
-        { success: false }
+        {
+          success: false,
+          message
+        }
       )
     })
 
@@ -113,7 +118,25 @@ describe('accounts.service', () => {
       expect(fetchMock).toHaveBeenCalledTimes(1)
       expect(fetchJsonMock).toHaveBeenCalledTimes(1)
       expect(result).toEqual<CheckAccountResult>(
-        { success: false }
+        {
+          success: false,
+          message
+        }
+      )
+    })
+
+    test('returns an error message when something goes wrong with the request', async () => {
+      fetchMock.mockRejectedValueOnce(new Error(message))
+
+      const result = await checkAccountByEmail('test@test.com')
+
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+      expect(fetchJsonMock).not.toHaveBeenCalled()
+      expect(result).toEqual<CheckAccountResult>(
+        {
+          success: false,
+          message
+        }
       )
     })
   })
