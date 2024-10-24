@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte'
+
   import Image from '../components/base/Image.svelte'
   import CheckAccount from '../components/CheckAccount.svelte'
   import { useAccounts, type AccountState } from '../hooks/use-accounts'

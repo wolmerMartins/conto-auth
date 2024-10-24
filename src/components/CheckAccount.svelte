@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte'
+
   import { useAccounts, type AccountState } from '../hooks/use-accounts'
   import { isValidEmail } from '../services/accounts.service'
   import Button from './base/Button.svelte'

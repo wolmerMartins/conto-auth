@@ -1,4 +1,5 @@
 import { get, writable, type Unsubscriber } from 'svelte/store'
+
 import { type CheckAccountByEmail } from '../services/accounts.service'
 
 export type AccountState = {
