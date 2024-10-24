@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/svelte'
 import userEvent from '@testing-library/user-event'
 import { expect, test, describe, vi } from 'vitest'
 
-import { configureUseAccounts, useAccounts, type AccountState } from '../../hooks/use-accounts'
+import { configureUseAccounts, useAccounts } from '../../hooks/use-accounts'
 import CheckAccount from '../CheckAccount.svelte'
 
 describe('CheckAccount.svelte', () => {

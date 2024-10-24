@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+
   import SignInAccount from '../components/SignInAccount.svelte'
   import SignUpAccount from '../components/SignUpAccount.svelte'
   import { useAccounts } from '../hooks/use-accounts'

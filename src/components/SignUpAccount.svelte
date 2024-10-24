@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+
   import { useAccounts } from '../hooks/use-accounts'
   import Button from './base/Button.svelte'
   import Input from './base/Input.svelte'
