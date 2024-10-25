@@ -4,6 +4,24 @@ import { checkAccountByEmail, isValidEmail, type CheckAccountResult } from '../a
 
 describe('accounts.service', () => {
   describe('isValidEmail()', () => {
+    test('returns false if the email is undefined', () => {
+      const result = isValidEmail(undefined)
+
+      expect(result).toBe(false)
+    })
+
+    test('returns false if the email is an empty string', () => {
+      const result = isValidEmail('')
+
+      expect(result).toBe(false)
+    })
+
+    test('returns false if the email is a whitespace', () => {
+      const result = isValidEmail(' ')
+
+      expect(result).toBe(false)
+    })
+
     test('returns false if the email does not contain an address', () => {
       const result = isValidEmail('@email.com')
 
@@ -62,6 +80,17 @@ describe('accounts.service', () => {
     })
 
     const message = 'It was not possible to check the account. Please try again.'
+
+    test('returns success false and invalid email message when the email is invalid', async () => {
+      const result = await checkAccountByEmail('email.com')
+
+      expect(result).toEqual<CheckAccountResult>(
+        {
+          success: false,
+          message: 'The email is not valid'
+        }
+      )
+    })
 
     test('makes a request with the provided email', async () => {
       const email = 'test@email.com'
