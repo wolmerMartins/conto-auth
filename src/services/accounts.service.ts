@@ -6,7 +6,9 @@ export type CheckAccountResult = {
 
 export type CheckAccountByEmail = (email: string) => Promise<CheckAccountResult>
 
-export function isValidEmail(email: string): boolean {
+export function isValidEmail(email?: string): boolean {
+  if (!email) return false
+
   const [address, domain] = email.split('@')
   if (!domain) return false
 
@@ -15,7 +17,7 @@ export function isValidEmail(email: string): boolean {
   return Boolean(address && domainName && domainExtension)
 }
 
-export async function checkAccountByEmail(email: string): Promise<CheckAccountResult> {
+async function checkAccount(email: string): Promise<CheckAccountResult> {
   try {
     const response = await fetch(`http://localhost:5000/accounts/${email}/exists`)
 
@@ -31,4 +33,17 @@ export async function checkAccountByEmail(email: string): Promise<CheckAccountRe
       message: 'It was not possible to check the account. Please try again.'
     }
   }
+}
+
+export async function checkAccountByEmail(email: string): Promise<CheckAccountResult> {
+  if (!isValidEmail(email)) {
+    return {
+      success: false,
+      message: 'The email is not valid'
+    }
+  }
+
+  const result = await checkAccount(email)
+
+  return result
 }
