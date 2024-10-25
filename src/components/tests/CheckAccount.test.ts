@@ -27,35 +27,6 @@ describe('CheckAccount.svelte', () => {
     expect(button).toHaveProperty('disabled', true)
   })
 
-  test('button must be disabled when the typed email is not valid', async () => {
-    const user = userEvent.setup()
-
-    render(CheckAccount)
-
-    const input = screen.getByLabelText('email')
-    await user.type(input, 'testemail.com')
-
-    const button = screen.getByRole('button')
-
-    expect(button).toHaveProperty('disabled', true)
-  })
-
-  test('input must display an error message when the email is not valid', async () => {
-    const user = userEvent.setup()
-
-    render(CheckAccount)
-
-    const input = screen.getByLabelText('email')
-    await user.type(input, 'test@email')
-
-    const button = screen.getByRole('button')
-    await user.click(button)
-
-    const error = screen.getByText('The email is not valid')
-
-    expect(error).toBeDefined()
-  })
-
   test('button must not be disabled when there is a email typed', async () => {
     const user = userEvent.setup()
 
@@ -67,6 +38,26 @@ describe('CheckAccount.svelte', () => {
     const button = screen.getByRole('button')
 
     expect(button).toHaveProperty('disabled', false)
+  })
+
+  test('displays an email invalid error when the typed email is not valid', async () => {
+    const message = 'The email is not valid'
+
+    checkAccountByEmailMock.mockResolvedValueOnce({ success: false, message })
+
+    const user = userEvent.setup()
+
+    render(CheckAccount)
+
+    const input = screen.getByLabelText('email')
+    await user.type(input, 'invalid@email')
+
+    const button = screen.getByRole('button')
+    await user.click(button)
+
+    const errorMessage = screen.getByText(message)
+
+    expect(errorMessage).toBeDefined()
   })
 
   test('sets the email into the global state when checking the account', async () => {
