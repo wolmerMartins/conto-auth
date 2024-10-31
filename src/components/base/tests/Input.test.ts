@@ -20,10 +20,22 @@ describe('Input.svelte', () => {
     expect(span).toBeNull()
   })
 
-  test('adds an error class to the input with an error', () => {
+  test('adds an error class to the input when rendering it with an error', () => {
     const label = 'test label'
 
     render(Input, { label, errorMessage: 'Error message' })
+
+    const input = screen.getByLabelText(label)
+
+    expect(input.classList).toContain('error-input')
+  })
+
+  test('adds an error class to the input when receiving an error message props', async () => {
+    const label = 'error label'
+
+    const { component } = render(Input, { label })
+
+    await component.$set({ errorMessage: 'Something wrong' })
 
     const input = screen.getByLabelText(label)
 
