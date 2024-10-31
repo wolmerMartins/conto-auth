@@ -4,12 +4,19 @@
   export let disabled = false
   export let errorMessage: string = ''
 
-  let inputClasses = 'input'
-  if (errorMessage) {
-    inputClasses += ' error-input'
+  let inputClasses: string
+
+  function setErrorInputClass(errorMessage?: string): string {
+    const baseClass = 'input'
+
+    if (!errorMessage) return baseClass
+
+    return `${baseClass} error-input`
   }
 
   const inputId = `input-${label}`
+
+  $: inputClasses = setErrorInputClass(errorMessage)
 </script>
 
 <div class="input-container">
