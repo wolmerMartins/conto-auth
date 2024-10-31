@@ -46,6 +46,11 @@
     font-size: 1rem;
   }
 
+  .input:disabled {
+    background-color: #c4c3c1;
+    color: #000000;
+  }
+
   .error-message {
     color: #e4572e;
   }
