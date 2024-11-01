@@ -12,10 +12,7 @@ start_logging() {
     docker compose ps | grep "Up" && has_started=1;
   done
 
-  while docker compose ps | grep "Up";
-  do
-    docker compose logs -f;
-  done
+  docker compose logs --follow
 }
 
 stop_dev() {

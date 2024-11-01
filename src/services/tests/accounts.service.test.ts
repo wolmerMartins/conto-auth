@@ -1,6 +1,6 @@
-import { describe, expect, vi, type Mock } from 'vitest'
+import { describe, expect, vi } from 'vitest'
 
-import { checkAccountByEmail, isValidEmail, type CheckAccountResult } from '../accounts.service'
+import { checkAccountByEmail, configureAccountServices, isValidEmail, type CheckAccountResult } from '../accounts.service'
 
 describe('accounts.service', () => {
   describe('isValidEmail()', () => {
@@ -60,24 +60,15 @@ describe('accounts.service', () => {
   })
 
   describe('checkAccountByEmail()', () => {
-    let fetch = global.fetch
+    const getMock = vi.fn()
 
-    let fetchMock: Mock
-    let fetchJsonMock: Mock
-
-    beforeEach(() => {
-      fetchJsonMock = vi.fn()
-
-      fetchMock = vi.fn(() => Promise.resolve({ json: fetchJsonMock }))
-
-      global.fetch = fetchMock
+    beforeAll(() => {
+      configureAccountServices({
+        get: getMock
+      })
     })
 
-    afterEach(() => {
-      vi.clearAllMocks()
-
-      global.fetch = fetch
-    })
+    afterEach(vi.clearAllMocks)
 
     const message = 'It was not possible to check the account. Please try again.'
 
@@ -93,44 +84,43 @@ describe('accounts.service', () => {
     })
 
     test('makes a request with the provided email', async () => {
+      getMock.mockResolvedValueOnce({ success: true, data: {} })
+
       const email = 'test@email.com'
 
       await checkAccountByEmail(email)
 
-      expect(fetchMock).toHaveBeenCalledWith(`http://localhost:5000/accounts/${email}/exists`)
+      expect(getMock).toHaveBeenCalledWith(`accounts/${email}/exists`)
     })
 
     test('returns an object with success true and exists false if the account for the email does not exist', async () => {
-      fetchJsonMock.mockResolvedValueOnce({ exists: false })
+      getMock.mockResolvedValueOnce({ success: true, data: { exists: false } })
 
       const result = await checkAccountByEmail('test@email.com')
 
-      expect(fetchMock).toHaveBeenCalledTimes(1)
-      expect(fetchJsonMock).toHaveBeenCalledTimes(1)
+      expect(getMock).toHaveBeenCalledTimes(1)
       expect(result).toEqual<CheckAccountResult>(
         { success: true, exists: false }
       )
     })
 
     test('returns an object with success true and exists true if the account for the email exists', async () => {
-      fetchJsonMock.mockResolvedValueOnce({ exists: true })
+      getMock.mockResolvedValueOnce({ success: true, data: { exists: true } })
 
       const result = await checkAccountByEmail('test@email.com')
 
-      expect(fetchMock).toHaveBeenCalledTimes(1)
-      expect(fetchJsonMock).toHaveBeenCalledTimes(1)
+      expect(getMock).toHaveBeenCalledTimes(1)
       expect(result).toEqual<CheckAccountResult>(
         { success: true, exists: true }
       )
     })
 
     test('returns an object with success false when the check account request rejects', async () => {
-      fetchMock.mockRejectedValueOnce(new Error('something went wrong'))
+      getMock.mockResolvedValueOnce({ success: false, error: new Error('something went wrong') })
 
       const result = await checkAccountByEmail('test@email.com')
 
-      expect(fetchMock).toHaveBeenCalledTimes(1)
-      expect(fetchJsonMock).not.toHaveBeenCalled()
+      expect(getMock).toHaveBeenCalledTimes(1)
       expect(result).toEqual<CheckAccountResult>(
         {
           success: false,
@@ -140,12 +130,11 @@ describe('accounts.service', () => {
     })
 
     test('returns an object with success false when the check account json parse rejects', async () => {
-      fetchJsonMock.mockRejectedValueOnce(new Error('something went wrong'))
+      getMock.mockResolvedValueOnce({ success: false, error: new Error('something went wrong') })
 
       const result = await checkAccountByEmail('test@email.com')
 
-      expect(fetchMock).toHaveBeenCalledTimes(1)
-      expect(fetchJsonMock).toHaveBeenCalledTimes(1)
+      expect(getMock).toHaveBeenCalledTimes(1)
       expect(result).toEqual<CheckAccountResult>(
         {
           success: false,
@@ -155,12 +144,11 @@ describe('accounts.service', () => {
     })
 
     test('returns an error message when something goes wrong with the request', async () => {
-      fetchMock.mockRejectedValueOnce(new Error(message))
+      getMock.mockResolvedValueOnce({ success: false, error: new Error(message) })
 
       const result = await checkAccountByEmail('test@test.com')
 
-      expect(fetchMock).toHaveBeenCalledTimes(1)
-      expect(fetchJsonMock).not.toHaveBeenCalled()
+      expect(getMock).toHaveBeenCalledTimes(1)
       expect(result).toEqual<CheckAccountResult>(
         {
           success: false,
