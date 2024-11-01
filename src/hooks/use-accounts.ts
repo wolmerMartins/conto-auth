@@ -97,11 +97,11 @@ function configureCheckAccount(checkAccountByEmail: CheckAccountByEmail): (email
   return async function(email: string): Promise<void> {
     startCheckingAccount()
 
-    const { success, exists, message } = await checkAccountByEmail(email)
-    if (!success)
-      return checkAccountFailed(message!)
+    const result = await checkAccountByEmail(email)
+    if (!result.success)
+      return checkAccountFailed(result.message)
 
-    checkAccountSucceed(email, exists)
+    checkAccountSucceed(email, result.exists)
   }
 }
 

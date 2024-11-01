@@ -1,8 +1,16 @@
-export type CheckAccountResult = {
-  success: boolean
-  exists?: boolean
-  message?: string
+import type { GetResult, HttpClient } from '../commons/http.client'
+
+type CheckAccountSuccess = {
+  success: true
+  exists: boolean
 }
+
+type CheckAccountError = {
+  success: false
+  message: string
+}
+
+export type CheckAccountResult = CheckAccountSuccess | CheckAccountError
 
 export type CheckAccountByEmail = (email: string) => Promise<CheckAccountResult>
 
@@ -17,33 +25,39 @@ export function isValidEmail(email?: string): boolean {
   return Boolean(address && domainName && domainExtension)
 }
 
-async function checkAccount(email: string): Promise<CheckAccountResult> {
-  try {
-    const response = await fetch(`http://localhost:5000/accounts/${email}/exists`)
-
-    const { exists } = await response.json()
-
-    return {
-      success: true,
-      exists
+function configureCheckAccountByEmail(httpClient: HttpClient): CheckAccountByEmail {
+  function handleCheckAccountByEmailResult(result: GetResult): CheckAccountResult {
+    if (!result.success) {
+      return {
+        success: result.success,
+        message: 'It was not possible to check the account. Please try again.'
+      }
     }
-  } catch {
-    return {
-      success: false,
-      message: 'It was not possible to check the account. Please try again.'
-    }
-  }
-}
 
-export async function checkAccountByEmail(email: string): Promise<CheckAccountResult> {
-  if (!isValidEmail(email)) {
     return {
-      success: false,
-      message: 'The email is not valid'
+      success: result.success,
+      exists: result.data.exists
     }
   }
 
-  const result = await checkAccount(email)
+  return async function(email: string): Promise<CheckAccountResult> {
+    if (!isValidEmail(email)) {
+      return {
+        success: false,
+        message: 'The email is not valid'
+      }
+    }
 
-  return result
+    const result = await httpClient.get(`accounts/${email}/exists`)
+
+    return handleCheckAccountByEmailResult(result)
+  }
 }
+
+let checkAccountByEmail: CheckAccountByEmail
+
+function configureAccountServices(httpClient: HttpClient): void {
+  checkAccountByEmail = configureCheckAccountByEmail(httpClient)
+}
+
+export { configureAccountServices, checkAccountByEmail }

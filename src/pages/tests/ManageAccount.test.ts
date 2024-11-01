@@ -5,9 +5,7 @@ import ManageAccount from '../ManageAccount.svelte'
 import { configureUseAccounts, useAccounts } from '../../hooks/use-accounts'
 
 describe('ManageAccount.svelte', () => {
-  const checkAccountByEmailMock = vi.fn(
-    async () => ({ success: true, exists: false })
-  )
+  const checkAccountByEmailMock = vi.fn()
 
   configureUseAccounts(checkAccountByEmailMock)
 
@@ -15,15 +13,19 @@ describe('ManageAccount.svelte', () => {
 
   const email = 'test.create@account.com'
 
-  beforeEach(async () => {
-    await checkAccount(email)
-  })
-
   afterEach(() => {
     resetState()
   })
 
-  test('inits the email input with the received value to create account', () => {
+  async function mockCheckedAccount(exists = true): Promise<void> {
+    checkAccountByEmailMock.mockResolvedValueOnce({ success: true, exists })
+
+    await checkAccount(email)
+  }
+
+  test('inits the email input with the received value to create account', async () => {
+    await mockCheckedAccount()
+
     render(ManageAccount)
 
     const inputEmail = screen.getByDisplayValue(email)
@@ -31,7 +33,9 @@ describe('ManageAccount.svelte', () => {
     expect(inputEmail).toBeDefined()
   })
 
-  test('must have a create account button if the account does not exist yet', () => {
+  test('must have a create account button if the account does not exist yet', async () => {
+    await mockCheckedAccount(false)
+
     render(ManageAccount)
 
     const createAccountButton = screen.getByText('create account')
@@ -39,7 +43,9 @@ describe('ManageAccount.svelte', () => {
     expect(createAccountButton).toBeDefined()
   })
 
-  test('inits the email input with the received value to login into account', () => {
+  test('inits the email input with the received value to login into account', async () => {
+    await mockCheckedAccount()
+
     render(ManageAccount)
 
     const inputEmail = screen.getByDisplayValue(email)
@@ -48,9 +54,7 @@ describe('ManageAccount.svelte', () => {
   })
 
   test('must have a login button if the account already exists', async () => {
-    checkAccountByEmailMock.mockResolvedValueOnce({ success: true, exists: true })
-
-    await checkAccount(email)
+    await mockCheckedAccount()
 
     render(ManageAccount)
 
